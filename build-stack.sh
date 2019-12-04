@@ -14,23 +14,25 @@ echo "$DBPASSWORD" > dbpassword.txt
 echo "$WPADMINPASSWORD" > wpadminpassword.txt
 
 export DEBIAN_FRONTEND=noninteractive
-wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
-dpkg -i mysql-apt-config_0.8.10-1_all.deb
+wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.13-1_all.deb
+dpkg -i mysql-apt-config_0.8.13-1_all.deb
+apt install software-properties-common
+add-apt-repository ppa:ondrej/php
 apt-get update -y
 apt-get upgrade -y
 apt-get install debconf-utils -y
 echo "mysql-community-server  mysql-server/default-auth-override      select  Use Strong Password Encryption (RECOMMENDED)" | debconf-set-selections
 apt-get install mysql-server -y # accept all defaults
-apt-get install php7.2 -y
+apt-get install php7.3 -y
 apt-get purge apache2 -y
 apt-get install nginx -y
-apt-get install -y tmux curl wget php7.2-fpm php7.2-cli php7.2-curl php7.2-gd php7.2-intl 
-apt-get install -y php7.2-mysql php7.2-mbstring php7.2-zip php7.2-xml unzip
+apt-get install -y tmux curl wget php7.3-fpm php7.3-cli php7.3-curl php7.3-gd php7.3-intl 
+apt-get install -y php7.3-mysql php7.3-mbstring php7.3-zip php7.3-xml unzip php7.3-soap php7.3-redis 
 apt-get install -y redis
 apt-get install -y fail2ban
 
 #redis config
-echo "maxmemory 300mb" >> /etc/redis/redis.conf
+echo "maxmemory 100mb" >> /etc/redis/redis.conf
 echo "maxmemory-policy allkeys-lru" >> /etc/redis/redis.conf
 
 sed -i 's/^save /#save /gi' /etc/redis/redis.conf
@@ -62,15 +64,15 @@ echo "expire_logs_days = 3" >> /etc/mysql/mysql.conf.d/mysqld.cnf
 service mysql restart
 
 #config php.ini
-sed -i 's/^max_execution_time = 30/max_execution_time = 600/gi' /etc/php/7.2/fpm/php.ini
-sed -i 's/^memory_limit = 128M/memory_limit = 512M/gi' /etc/php/7.2/fpm/php.ini
-sed -i 's/^upload_max_filesize = 2M/upload_max_filesize = 20M/gi' /etc/php/7.2/fpm/php.ini
+sed -i 's/^max_execution_time = 30/max_execution_time = 600/gi' /etc/php/7.3/fpm/php.ini
+sed -i 's/^memory_limit = 128M/memory_limit = 512M/gi' /etc/php/7.3/fpm/php.ini
+sed -i 's/^upload_max_filesize = 2M/upload_max_filesize = 20M/gi' /etc/php/7.3/fpm/php.ini
 
 #config www.conf
-sed -i 's/^pm = dynamic/pm = static/gi' /etc/php/7.2/fpm/pool.d/www.conf
-sed -i 's/^pm.max_children = 5/pm.max_children = 25/gi' /etc/php/7.2/fpm/pool.d/www.conf
+sed -i 's/^pm = dynamic/pm = static/gi' /etc/php/7.3/fpm/pool.d/www.conf
+sed -i 's/^pm.max_children = 5/pm.max_children = 25/gi' /etc/php/7.3/fpm/pool.d/www.conf
 
-service php7.2-fpm restart
+service php7.3-fpm restart
 
 apt-get install software-properties-common -y
 add-apt-repository universe -y
