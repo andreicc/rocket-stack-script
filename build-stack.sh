@@ -14,6 +14,13 @@ echo "$DBPASSWORD" > dbpassword.txt
 echo "$WPADMINPASSWORD" > wpadminpassword.txt
 
 export DEBIAN_FRONTEND=noninteractive
+
+apt update
+apt upgrade
+apt install preload
+reboot
+cd ~
+mkdir install
 wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.13-1_all.deb
 dpkg -i mysql-apt-config_0.8.13-1_all.deb
 apt install software-properties-common
@@ -22,20 +29,24 @@ apt-get update -y
 apt-get upgrade -y
 apt-get install debconf-utils -y
 echo "mysql-community-server  mysql-server/default-auth-override      select  Use Strong Password Encryption (RECOMMENDED)" | debconf-set-selections
-apt-get install mysql-server -y # accept all defaults
-apt-get install php7.3 -y
+apt-get install mysql-server -y
+apt-get -y install php7.3
 apt-get purge apache2 -y
 apt-get install nginx -y
-apt-get install -y tmux curl wget php7.3-fpm php7.3-cli php7.3-curl php7.3-gd php7.3-intl 
-apt-get install -y php7.3-mysql php7.3-mbstring php7.3-zip php7.3-xml unzip php7.3-soap php7.3-redis 
+apt-get install -y tmux curl wget php7.3-fpm php7.3-cli php7.3-curl php7.3-gd php7.3-intl
+apt-get install -y php7.3-mysql php7.3-mbstring php7.3-zip php7.3-xml unzip php7.3-soap php7.3-redis
 apt-get install -y redis
 apt-get install -y fail2ban
+apt-get update -y
+apt-get upgrade -y
 
 #redis config
-echo "maxmemory 100mb" >> /etc/redis/redis.conf
+echo "maxmemory 400mb" >> /etc/redis/redis.conf
 echo "maxmemory-policy allkeys-lru" >> /etc/redis/redis.conf
 
 sed -i 's/^save /#save /gi' /etc/redis/redis.conf
+
+service redis-server restart
 
 #nginx config
 git clone https://github.com/dhilditch/wpintense-rocket-stack-ubuntu18-wordpress /root/rsconfig
@@ -106,5 +117,3 @@ chown www-data:www-data /var/www/rocketstack -R
 echo "You can now log in through https://${SITEURL}/wp-login.php"
 echo "Username: rsadmin";
 echo "Password: $WPADMINPASSWORD";
-
-
